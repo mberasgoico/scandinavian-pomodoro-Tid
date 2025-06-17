@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Focus</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #2c3e50;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            padding: 3rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            max-width: 400px;
+            width: 90%;
+            transform: translateY(0);
+            transition: all 0.3s ease;
+        }
+
+        .container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .mode-indicator {
+            font-size: 0.875rem;
+            font-weight: 500;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #7f8c8d;
+            margin-bottom: 1rem;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        .timer-display {
+            font-size: 4rem;
+            font-weight: 200;
+            margin: 2rem 0;
+            color: #2c3e50;
+            font-variant-numeric: tabular-nums;
+            opacity: 0;
+            animation: fadeIn 0.5s ease 0.2s forwards;
+        }
+
+        .progress-ring {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 2rem;
+            opacity: 0;
+            animation: fadeIn 0.5s ease 0.4s forwards;
+        }
+
+        .progress-ring-circle {
+            stroke: #ecf0f1;
+            stroke-width: 3;
+            fill: transparent;
+            r: 90;
+            cx: 100;
+            cy: 100;
+        }
+
+        .progress-ring-progress {
+            stroke: #3498db;
+            stroke-width: 3;
+            fill: transparent;
+            r: 90;
+            cx: 100;
+            cy: 100;
+            stroke-dasharray: 565.48;
+            stroke-dashoffset: 565.48;
+            transition: stroke-dashoffset 0.5s ease;
+            stroke-linecap: round;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            margin-top: 2rem;
+            opacity: 0;
+            animation: fadeIn 0.5s ease 0.6s forwards;
+        }
+
+        .btn {
+            padding: 0.75rem 2rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-secondary {
+            background: rgba(149, 165, 166, 0.1);
+            color: #7f8c8d;
+            border: 1px solid rgba(149, 165, 166, 0.2);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(149, 165, 166, 0.2);
+            transform: translateY(-1px);
+        }
+
+        .session-counter {
+            margin-top: 2rem;
+            color: #7f8c8d;
+            font-size: 0.875rem;
+            opacity: 0;
+            animation: fadeIn 0.5s ease 0.8s forwards;
+        }
+
+        .session-dots {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ecf0f1;
+            transition: all 0.3s ease;
+        }
+
+        .dot.completed {
+            background: #3498db;
+            transform: scale(1.2);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .timer-display.pulse {
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        .work-mode .progress-ring-progress {
+            stroke: #e74c3c;
+        }
+
+        .work-mode .btn-primary {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .work-mode .btn-primary:hover {
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .break-mode .progress-ring-progress {
+            stroke: #27ae60;
+        }
+
+        .break-mode .btn-primary {
+            background: linear-gradient(135deg, #27ae60, #229954);
+            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
+        }
+
+        .break-mode .btn-primary:hover {
+            box-shadow: 0 6px 20px rgba(39, 174, 96, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="container">
+        <div class="mode-indicator" id="modeIndicator">Focus Session</div>
+        
+        <svg class="progress-ring" id="progressRing">
+            <circle class="progress-ring-circle"></circle>
+            <circle class="progress-ring-progress" id="progressCircle"></circle>
+        </svg>
+        
+        <div class="timer-display" id="timerDisplay">25:00</div>
+        
+        <div class="controls">
+            <button class="btn btn-primary" id="startBtn">Start</button>
+            <button class="btn btn-secondary" id="resetBtn">Reset</button>
+        </div>
+        
+        <div class="session-counter">
+            <div>Session <span id="sessionNumber">1</span> of 4</div>
+            <div class="session-dots" id="sessionDots">
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        class PomodoroTimer {
+            constructor() {
+                this.workTime = 25 * 60; // 25 minutes in seconds
+                this.shortBreak = 5 * 60; // 5 minutes
+                this.longBreak = 15 * 60; // 15 minutes
+                this.currentTime = this.workTime;
+                this.isRunning = false;
+                this.isWorkSession = true;
+                this.sessionCount = 0;
+                this.completedSessions = 0;
+                this.timer = null;
+                
+                this.initElements();
+                this.bindEvents();
+                this.updateDisplay();
+                this.updateProgress();
+            }
+
+            initElements() {
+                this.container = document.getElementById('container');
+                this.timerDisplay = document.getElementById('timerDisplay');
+                this.startBtn = document.getElementById('startBtn');
+                this.resetBtn = document.getElementById('resetBtn');
+                this.modeIndicator = document.getElementById('modeIndicator');
+                this.progressCircle = document.getElementById('progressCircle');
+                this.sessionNumber = document.getElementById('sessionNumber');
+                this.sessionDots = document.getElementById('sessionDots');
+            }
+
+            bindEvents() {
+                this.startBtn.addEventListener('click', () => this.toggleTimer());
+                this.resetBtn.addEventListener('click', () => this.resetTimer());
+            }
+
+            toggleTimer() {
+                if (this.isRunning) {
+                    this.pauseTimer();
+                } else {
+                    this.startTimer();
+                }
+            }
+
+            startTimer() {
+                this.isRunning = true;
+                this.startBtn.textContent = 'Pause';
+                this.timerDisplay.classList.remove('pulse');
+                
+                this.timer = setInterval(() => {
+                    this.currentTime--;
+                    this.updateDisplay();
+                    this.updateProgress();
+                    
+                    if (this.currentTime <= 0) {
+                        this.completeSession();
+                    }
+                }, 1000);
+            }
+
+            pauseTimer() {
+                this.isRunning = false;
+                this.startBtn.textContent = 'Start';
+                this.timerDisplay.classList.add('pulse');
+                clearInterval(this.timer);
+            }
+
+            resetTimer() {
+                this.pauseTimer();
+                this.currentTime = this.isWorkSession ? this.workTime : 
+                                 (this.completedSessions % 4 === 3 ? this.longBreak : this.shortBreak);
+                this.updateDisplay();
+                this.updateProgress();
+            }
+
+            completeSession() {
+                this.pauseTimer();
+                
+                if (this.isWorkSession) {
+                    this.completedSessions++;
+                    this.updateSessionDots();
+                    
+                    // Switch to break
+                    this.isWorkSession = false;
+                    this.currentTime = this.completedSessions % 4 === 0 ? this.longBreak : this.shortBreak;
+                    this.modeIndicator.textContent = this.completedSessions % 4 === 0 ? 'Long Break' : 'Short Break';
+                    this.container.classList.remove('work-mode');
+                    this.container.classList.add('break-mode');
+                } else {
+                    // Switch back to work
+                    this.isWorkSession = true;
+                    this.currentTime = this.workTime;
+                    this.modeIndicator.textContent = 'Focus Session';
+                    this.container.classList.remove('break-mode');
+                    this.container.classList.add('work-mode');
+                    
+                    if (this.completedSessions % 4 === 0) {
+                        this.resetCycle();
+                    } else {
+                        this.sessionNumber.textContent = (this.completedSessions % 4) + 1;
+                    }
+                }
+                
+                this.updateDisplay();
+                this.updateProgress();
+                this.showNotification();
+            }
+
+            resetCycle() {
+                this.completedSessions = 0;
+                this.sessionNumber.textContent = '1';
+                this.sessionDots.querySelectorAll('.dot').forEach(dot => {
+                    dot.classList.remove('completed');
+                });
+            }
+
+            updateDisplay() {
+                const minutes = Math.floor(this.currentTime / 60);
+                const seconds = this.currentTime % 60;
+                this.timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            }
+
+            updateProgress() {
+                const totalTime = this.isWorkSession ? this.workTime : 
+                                 (this.completedSessions % 4 === 3 ? this.longBreak : this.shortBreak);
+                const progress = (totalTime - this.currentTime) / totalTime;
+                const circumference = 2 * Math.PI * 90;
+                const dashOffset = circumference - (progress * circumference);
+                this.progressCircle.style.strokeDashoffset = dashOffset;
+            }
+
+            updateSessionDots() {
+                const dots = this.sessionDots.querySelectorAll('.dot');
+                const completedInCycle = this.completedSessions % 4;
+                dots.forEach((dot, index) => {
+                    if (index < completedInCycle) {
+                        dot.classList.add('completed');
+                    }
+                });
+            }
+
+            showNotification() {
+                if ('Notification' in window && Notification.permission === 'granted') {
+                    const message = this.isWorkSession ? 
+                        'Break time! Take a moment to rest.' : 
+                        'Break over! Ready for another focus session?';
+                    new Notification('Pomodoro Timer', { body: message });
+                }
+            }
+        }
+
+        // Initialize the timer when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Request notification permission
+            if ('Notification' in window && Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+            
+            new PomodoroTimer();
+        });
+    </script>
+</body>
+</html>
