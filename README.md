@@ -2,6 +2,8 @@
 
 A beautifully designed, ultra-minimal Pomodoro timer with a clean Scandinavian aesthetic. Built with vanilla HTML, CSS, and JavaScript.
 
+BTW - Tid means time in Swedish (according to ChatGPT)
+
 ## ✨ Features
 
 - **Clean, Minimal Design** - Scandinavian-inspired interface with subtle glassmorphism effects
